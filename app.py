@@ -71,6 +71,32 @@ st.markdown(
         border-radius: var(--st-button-radius, 6px);
         font-weight: 500;
     }
+
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+        row-gap: 1rem;
+    }
+
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+        min-width: 240px !important;
+        flex: 1 1 240px !important;
+        width: auto !important;
+    }
+
+    div[data-testid="stMetric"] {
+        min-width: 0;
+    }
+
+    div[data-testid="stMetricValue"] {
+        font-size: 1.3rem;
+    }
+
+    @media (max-width: 640px) {
+        h1 { font-size: 1.3rem; }
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+            min-width: 100% !important;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -160,8 +186,9 @@ with tab1:
         color_discrete_sequence=CATEGORY_PALETTE,
         labels={"value": "Quantité achetée", "name": "Client", "variable": "Catégorie"},
         title="Quantités achetées par catégorie et par client",
-        facet_col="Persona" if len(persona_sel) > 1 else None,
+        hover_data={"Persona": True},
     )
+    fig_bar.update_layout(legend_title_text="Catégorie", xaxis_title="Client")
     st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
 
 with tab2:
