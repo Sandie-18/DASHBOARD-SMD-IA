@@ -8,134 +8,73 @@ st.set_page_config(
     layout="wide",
 )
 
-PRIMARY = "#1F2A44"
-ACCENT = "#3E6AE1"
-MUTED = "#8A93A6"
-BG = "#F5F6F8"
-CARD = "#FFFFFF"
-BORDER = "#E4E7EC"
-
 PERSONA_COLORS = {
     "Client Actif Multi-catégories": "#3E6AE1",
     "Client Occasionnel": "#D98E4A",
 }
 
-CHANNEL_PALETTE = ["#3E6AE1", "#D98E4A", "#3FA796", "#B15CE0", "#E0556F"]
+CATEGORY_PALETTE = ["#3E6AE1", "#D98E4A", "#3FA796", "#B15CE0"]
+STATUS_COLORS = {"Forte valeur": "#3FA796", "Valeur standard": "#D9647A"}
 
 st.markdown(
-    f"""
+    """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    html, body, [class*="css"] {{
+    html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
-    }}
+    }
 
-    .stApp {{
-        background-color: {BG};
-    }}
-
-    section[data-testid="stSidebar"] {{
-        background-color: {CARD};
-        border-right: 1px solid {BORDER};
-    }}
-
-    h1, h2, h3, h4 {{
-        color: {PRIMARY};
+    h1, h2, h3, h4 {
         font-weight: 600;
-    }}
-
-    h1 {{
-        font-size: 1.6rem;
         letter-spacing: -0.01em;
-    }}
+    }
 
-    p, .stCaption, [data-testid="stCaptionContainer"] {{
-        color: {MUTED};
-    }}
+    h1 {
+        font-size: 1.6rem;
+    }
 
-    div[data-testid="stMetric"] {{
-        background-color: {CARD};
-        border: 1px solid {BORDER};
-        border-radius: 10px;
+    div[data-testid="stMetric"] {
+        background-color: var(--st-secondary-background-color);
+        border: 1px solid var(--st-border-color);
+        border-radius: var(--st-base-radius, 10px);
         padding: 1rem 1.2rem;
-    }}
+    }
 
-    div[data-testid="stMetricLabel"] {{
-        color: {MUTED};
+    div[data-testid="stMetricLabel"] {
         font-size: 0.78rem;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-    }}
+    }
 
-    div[data-testid="stMetricValue"] {{
-        color: {PRIMARY};
-        font-weight: 700;
-    }}
-
-    div[data-testid="stVerticalBlockBorderWrapper"] {{
-        background-color: {CARD};
-        border: 1px solid {BORDER};
-        border-radius: 10px;
-    }}
-
-    .stTabs [data-baseweb="tab-list"] {{
+    .stTabs [data-baseweb="tab-list"] {
         gap: 0.5rem;
-        border-bottom: 1px solid {BORDER};
-    }}
+        border-bottom: 1px solid var(--st-border-color);
+    }
 
-    .stTabs [data-baseweb="tab"] {{
-        color: {MUTED};
+    .stTabs [data-baseweb="tab"] {
         font-weight: 500;
         padding: 0.6rem 0.2rem;
-    }}
+    }
 
-    .stTabs [aria-selected="true"] {{
-        color: {ACCENT};
-        border-bottom: 2px solid {ACCENT};
-    }}
+    .stTabs [aria-selected="true"] {
+        color: var(--st-primary-color);
+        border-bottom: 2px solid var(--st-primary-color);
+    }
 
-    div[data-testid="stDataFrame"] {{
-        border: 1px solid {BORDER};
+    div[data-testid="stDataFrame"] {
+        border: 1px solid var(--st-border-color);
         border-radius: 8px;
-    }}
+    }
 
-    .stButton>button, .stDownloadButton>button {{
-        background-color: {PRIMARY};
-        color: white;
-        border-radius: 6px;
-        border: none;
+    .stButton>button, .stDownloadButton>button {
+        border-radius: var(--st-button-radius, 6px);
         font-weight: 500;
-    }}
-
-    .stButton>button:hover, .stDownloadButton>button:hover {{
-        background-color: {ACCENT};
-        color: white;
-    }}
-
-    hr {{
-        border-color: {BORDER};
-    }}
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
-
-PLOT_LAYOUT = dict(
-    font=dict(family="Inter, sans-serif", color=PRIMARY, size=12),
-    plot_bgcolor=CARD,
-    paper_bgcolor=CARD,
-    title_font=dict(size=14, color=PRIMARY),
-    legend=dict(bgcolor="rgba(0,0,0,0)"),
-    margin=dict(t=50, l=10, r=10, b=10),
-)
-
-
-def style_fig(fig):
-    fig.update_layout(**PLOT_LAYOUT)
-    fig.update_xaxes(gridcolor=BORDER, zeroline=False)
-    fig.update_yaxes(gridcolor=BORDER, zeroline=False)
-    return fig
 
 
 @st.cache_data
@@ -198,7 +137,7 @@ with tab1:
         )
         fig_pca.update_traces(textposition="top center")
         fig_pca.update_layout(legend_title_text="Persona")
-        st.plotly_chart(style_fig(fig_pca), use_container_width=True)
+        st.plotly_chart(fig_pca, use_container_width=True, theme="streamlit")
 
     with c2:
         st.subheader("Répartition des segments")
@@ -208,7 +147,7 @@ with tab1:
             seg_counts, names="Persona", values="Nb_Clients",
             color="Persona", color_discrete_map=PERSONA_COLORS, hole=0.55,
         )
-        st.plotly_chart(style_fig(fig_pie), use_container_width=True)
+        st.plotly_chart(fig_pie, use_container_width=True, theme="streamlit")
 
     st.subheader("Profil moyen par segment")
     profile_cols = ["age", "total_spent", "Nb_Transactions", "Total_Quantity", "Avg_Basket_Value", "CLV_predite_RF"]
@@ -218,12 +157,12 @@ with tab1:
 
     fig_bar = px.bar(
         clients_f, x="name", y=["Clothing", "Footwear", "Outerwear", "Accessories"],
-        color_discrete_sequence=CHANNEL_PALETTE,
+        color_discrete_sequence=CATEGORY_PALETTE,
         labels={"value": "Quantité achetée", "name": "Client", "variable": "Catégorie"},
         title="Quantités achetées par catégorie et par client",
         facet_col="Persona" if len(persona_sel) > 1 else None,
     )
-    st.plotly_chart(style_fig(fig_bar), use_container_width=True)
+    st.plotly_chart(fig_bar, use_container_width=True, theme="streamlit")
 
 with tab2:
     c1, c2 = st.columns(2)
@@ -232,20 +171,20 @@ with tab2:
         st.subheader("ROI par campagne")
         fig_roi = px.bar(
             kpi_f, x="campaign_id", y="ROI (%)", color="channel",
-            color_discrete_sequence=CHANNEL_PALETTE,
+            color_discrete_sequence=CATEGORY_PALETTE,
             labels={"campaign_id": "Campagne"},
         )
-        fig_roi.add_hline(y=0, line_dash="dash", line_color=MUTED)
-        st.plotly_chart(style_fig(fig_roi), use_container_width=True)
+        fig_roi.add_hline(y=0, line_dash="dash")
+        st.plotly_chart(fig_roi, use_container_width=True, theme="streamlit")
 
     with c2:
         st.subheader("Coût par acquisition")
         fig_cpa = px.bar(
             kpi_f, x="campaign_id", y="CPA (€)", color="channel",
-            color_discrete_sequence=CHANNEL_PALETTE,
+            color_discrete_sequence=CATEGORY_PALETTE,
             labels={"campaign_id": "Campagne"},
         )
-        st.plotly_chart(style_fig(fig_cpa), use_container_width=True)
+        st.plotly_chart(fig_cpa, use_container_width=True, theme="streamlit")
 
     st.subheader("KPIs moyens par canal")
     kpi_par_canal = kpi_f.groupby("channel")[["CTR (%)", "Taux_conversion (%)", "ROI (%)", "CPA (€)"]].mean().round(2)
@@ -260,10 +199,10 @@ with tab2:
                    kpi_par_canal.loc[canal, "ROI (%)"] / 20],
                 theta=["CTR (%)", "Taux de conversion (%)", "ROI (/20)"],
                 fill="toself", name=canal,
-                line=dict(color=CHANNEL_PALETTE[i % len(CHANNEL_PALETTE)]),
+                line=dict(color=CATEGORY_PALETTE[i % len(CATEGORY_PALETTE)]),
             ))
         fig_radar.update_layout(title="Comparaison des canaux (échelles ajustées)", showlegend=True)
-        st.plotly_chart(style_fig(fig_radar), use_container_width=True)
+        st.plotly_chart(fig_radar, use_container_width=True, theme="streamlit")
 
     st.subheader("Campagne associée à chaque segment client")
     camp_seg = clients_f.dropna(subset=["campagne_attribuee"])[["name", "Persona", "canal_prefere", "campagne_attribuee"]]
@@ -279,9 +218,9 @@ with tab3:
             labels={"Total_Revenue": "CLV réelle (€)", "CLV_predite_RF": "CLV prédite (€)"},
         )
         max_val = max(clients_f["Total_Revenue"].max(), clients_f["CLV_predite_RF"].max()) + 20 if len(clients_f) else 100
-        fig_clv.add_shape(type="line", x0=0, y0=0, x1=max_val, y1=max_val, line=dict(dash="dash", color=MUTED))
+        fig_clv.add_shape(type="line", x0=0, y0=0, x1=max_val, y1=max_val, line=dict(dash="dash"))
         fig_clv.update_traces(textposition="top center", marker=dict(size=14))
-        st.plotly_chart(style_fig(fig_clv), use_container_width=True)
+        st.plotly_chart(fig_clv, use_container_width=True, theme="streamlit")
 
     with c2:
         st.subheader("Clients à forte valeur")
@@ -290,10 +229,10 @@ with tab3:
         fig_hv = px.bar(
             clients_f_disp.sort_values("CLV_predite_RF", ascending=False),
             x="name", y="CLV_predite_RF", color="Statut",
-            color_discrete_map={"Forte valeur": "#3FA796", "Valeur standard": "#E0556F"},
+            color_discrete_map=STATUS_COLORS,
             labels={"CLV_predite_RF": "CLV prédite (€)", "name": "Client"},
         )
-        st.plotly_chart(style_fig(fig_hv), use_container_width=True)
+        st.plotly_chart(fig_hv, use_container_width=True, theme="streamlit")
 
 with tab4:
     st.subheader("Table clients — données fusionnées")
